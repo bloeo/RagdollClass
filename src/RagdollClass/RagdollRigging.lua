@@ -1,5 +1,10 @@
--- Grabbed this neato code from here: https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Ragdoll/RagdollRigging.lua
--- Not sure who the original author is, might be quenty.
+--[[
+	Name: RagdollRigging
+	Author: Quenty
+
+	Source: https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Ragdoll/RagdollRigging.lua
+	License: https://github.com/Quenty/NevermoreEngine/blob/version2/LICENSE.md
+--]]
 
 local RunService = game:GetService("RunService")
 
@@ -255,11 +260,7 @@ local function createRigJoints(parts, rig)
 				local constraint = part1:FindFirstChild(BALL_SOCKET_NAME)
 				if not constraint then
 					constraint = Instance.new("BallSocketConstraint")
-					constraint.Name = BALL_SOCKET_NAME
-
-					if RunService:IsClient() then
-						--warn(("[RagdollRigging] - Creating BallSocketConstraint %q"))
-					end
+					constraint.Name = RunService:IsClient() and BALL_SOCKET_NAME or "Server" .. BALL_SOCKET_NAME
 				end
 				constraint.Attachment0 = a0
 				constraint.Attachment1 = a1

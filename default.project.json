@@ -4,8 +4,8 @@
     "$className": "DataModel",
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
-      "Source": {
-        "$path": "src"
+      "RagdollClass": {
+        "$path": "src/RagdollClass"
       }
     }
   }

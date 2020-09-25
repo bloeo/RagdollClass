@@ -2,33 +2,19 @@
 	Name: RagdollClass
 	Author: guidable
 
-	Source: 
-	License: 
-
-	25th of September, 2020
+	Source: https://github.com/aku-e/RagdollClass/blob/master/src/RagdollClass/init.lua
+	License: https://github.com/aku-e/RagdollClass/blob/master/LICENSE.md
 --]]
-
-
 
 local RagdollClass = {};
 RagdollClass.__index = RagdollClass;
 
--- These settings are exaggarated, as to give it more of a "comedic" and "cartoon'ish" effect
-local MAX_RANDOM_VELOCITY = Vector3.new(
-	10,
-	28,
-	10
-);
-local REDUCE_FRICTION_LIMBS = {
-	"Arm",
-	"Leg",
-};
-local REDUCED_FRICTION = 0.15;
-local REDUCED_FRICTION_WEIGHT = 50;
+local RunService = game:GetService("RunService")
 
-local Maid;
-local RagdollRigging;
-
+local Maid = require(script.Maid);
+local RagdollRigging = require(script.RagdollRigging);
+-- Configure ragdoll settings in configuration.
+local Configuration = require(script.Configuration);
 -- @@ Constructors
 function RagdollClass.new(character: Player.Character)
 	local self = setmetatable({
@@ -93,25 +79,20 @@ function RagdollClass:SetRagdollEnabled(enabled: boolean)
 			animationTrack:Stop(0.001);
 		end;
 
+		local maxRandomVelocity = Configuration.MaxRandomVelocity
 		local randomObject = Random.new(os.clock() * 1000 + (humanoidRootPart.Velocity + humanoidRootPart.Position + humanoidRootPart.Orientation).Magnitude * 100000);
 		for _, basePart in pairs(character:GetDescendants()) do
 			if basePart:IsA("BasePart") then
 				local limb = humanoid:GetLimb(basePart);
 				if limb ~= Enum.Limb.Unknown then
 					local randomVelocity = Vector3.new(
-						randomObject:NextNumber(-MAX_RANDOM_VELOCITY.X, MAX_RANDOM_VELOCITY.X),
-						randomObject:NextNumber(-MAX_RANDOM_VELOCITY.Y, MAX_RANDOM_VELOCITY.Y),
-						randomObject:NextNumber(-MAX_RANDOM_VELOCITY.Z, MAX_RANDOM_VELOCITY.Z)
+						randomObject:NextNumber(-maxRandomVelocity.X, maxRandomVelocity.X),
+						randomObject:NextNumber(-maxRandomVelocity.Y, maxRandomVelocity.Y),
+						randomObject:NextNumber(-maxRandomVelocity.Z, maxRandomVelocity.Z)
 					);
 					basePart.Velocity = basePart.Velocity + humanoidRootPart.CFrame:VectorToWorldSpace(randomVelocity);
 				end;
 			end;
-		end;
-
-		if humanoidRootPart.Velocity.Magnitude <= MAX_RANDOM_VELOCITY.Magnitude / 3 then
-			humanoidRootPart.Velocity = humanoidRootPart.Velocity + humanoidRootPart.CFrame:VectorToWorldSpace(
-				Vector3.new(0, -5, -10)
-			);
 		end;
 
 		self:ReduceFriction();
@@ -125,7 +106,12 @@ function RagdollClass:SetRagdollEnabled(enabled: boolean)
 				humanoid:ChangeState(Enum.HumanoidStateType.Physics);
 			end;
 		end));
+
+		-- I'm aware how this is slightly scuffed, however it is necessary for ragdolls to work smoothly on the server + client.
+		self.maid:GiveTask(character.DescendantAdded:Connect(function()
 		
+		end))
+
 		self.maid:GiveTask(function()
 			RagdollRigging.removeRagdollJoints(character);
 			for _, motor in pairs(motors) do
@@ -145,22 +131,24 @@ function RagdollClass:SetRagdollEnabled(enabled: boolean)
 end;
 
 function RagdollClass:ResetFriction()
+	local reducedFrictionLimbs = Configuration.ReducedFrictionLimbs;
 	for _, basePart in pairs(self.character:GetChildren()) do
-		if basePart:IsA("BasePart") and table.find(REDUCE_FRICTION_LIMBS, RagdollClass.GetLastWordFromPascalCase(basePart.Name)) then
+		if basePart:IsA("BasePart") and table.find(reducedFrictionLimbs, RagdollClass.GetLastWordFromPascalCase(basePart.Name)) then
 			basePart.CustomPhysicalProperties = PhysicalProperties.new(basePart.Material);
 		end;
 	end;
 end;
 
 function RagdollClass:ReduceFriction()
+	local reducedFrictionLimbs = Configuration.ReducedFrictionLimbs;
 	for _, basePart in pairs(self.character:GetChildren()) do
-		if basePart:IsA("BasePart") and table.find(REDUCE_FRICTION_LIMBS, RagdollClass.GetLastWordFromPascalCase(basePart.Name)) then
+		if basePart:IsA("BasePart") and table.find(reducedFrictionLimbs, RagdollClass.GetLastWordFromPascalCase(basePart.Name)) then
 			local materialPhysicalProperties = PhysicalProperties.new(basePart.Material);
 			basePart.CustomPhysicalProperties = PhysicalProperties.new(
-				materialPhysicalProperties.Density, 
-				REDUCED_FRICTION, 
-				materialPhysicalProperties.Elasticity, 
-				REDUCED_FRICTION_WEIGHT, 
+				materialPhysicalProperties.Density,
+				Configuration.ReducedFriction,
+				materialPhysicalProperties.Elasticity,
+				Configuration.ReducedFrictionWeight,
 				materialPhysicalProperties.ElasticityWeight
 			);
 		end;
@@ -186,12 +174,5 @@ function RagdollClass.GetLastWordFromPascalCase(text: string)
 	word = word:gsub("%d+$", "");
 	return word;
 end;
-
--- @@ AeroGameFramework functions
-function RagdollClass:Init()
-	Maid = self.Shared.Maid;
-	RagdollRigging = require(script.RagdollRigging);
-end;
-
 
 return RagdollClass;
