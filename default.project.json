@@ -1,0 +1,12 @@
+{
+  "name": "RagdollClass",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Source": {
+        "$path": "src"
+      }
+    }
+  }
+}
