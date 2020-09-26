@@ -7,7 +7,7 @@ so that you cannot abuse the client bodies difference.
 Unfortunately, they come with a few drawbacks:
 
 - They are not very smooth, they appear slightly choppy on Roblox. I do not know why this happens.
-- They hurt the server performance in large amounts, as there is a lot to replicate.
+- They hurt the server performance in large amounts.
 
 They are considerably easier to make than client-sided bodies, as you have to do less work overall.
 
