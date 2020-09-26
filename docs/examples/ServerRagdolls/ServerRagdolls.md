@@ -26,5 +26,7 @@
 
  The example should now be setup, and you can now observe how it functions.
 
+ Here's a place using this example: https://www.roblox.com/games/5741083774. It is uncopylocked, so feel free to take a copy of it.
+
  I'd love to do an example for client ragdolls, however there's some weird bugs I do not know how to counter.
  If you want to implement client ragdolls, please do because you're able to. This is only an example.
