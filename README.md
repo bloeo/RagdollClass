@@ -17,6 +17,10 @@
 
 ## Avatar Support
  This supports both R6 and R15.
+ 
+ ![R6](https://media.giphy.com/media/PJ8uInGZPGJvCbAV0M/giphy.gif)
+ 
+ ![R15](https://media.giphy.com/media/BcUCfhvhbnlM8l2ow4/giphy.gif)
 
 ## Credits
  The actual ragdoll code itself was made by Quenty.
