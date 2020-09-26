@@ -17,6 +17,7 @@ local RagdollClass = require(ReplicatedStorage:WaitForChild("RagdollClass"));
 local ragdollKeybind = Enum.KeyCode.R;
 
 -- Other variables
+local ragdolls = {};
 local clientRagdoll;
 local head;
 local humanoid;
@@ -37,9 +38,9 @@ local function handleAction(_, userInputState)
 		elseif humanoid and not ragdollEnabled then
 			currentCamera.CameraSubject = humanoid;
 		end
-		-- We can assume that the RagdollClass object exists, as the action can only be binded when the character spawns in, which is when the ragdoll gets created.
+		-- We can safely assume that the RagdollClass object exists, as the action can only be binded when the character spawns in, which is when the ragdoll gets created.
 		clientRagdoll:SetRagdollEnabled(ragdollEnabled);
-		-- Tell the server, "Hey, the ragdoll is in this state!", so that they can create or remove the ragdoll on their side, to show that this user is in this state.
+		-- Tell the server, "Hey, the ragdoll is in this state!", so that they can replicate that information to other clients, to show that we are in this state.
 		-- We also replicate the ragdoll seed, in order to make the random velocity result the same.
 		ragdollRemote:FireServer(ragdollEnabled, RagdollClass.Seed);
 	end;
@@ -75,6 +76,53 @@ local function onCharacterAdded(character)
 	end);
 end;
 
+-- Everything is copied from  ServerRagdolls ClientRagdollHandler example, until this part. This is where we handle other people's ragdolls.
+
+-- We pretty much have the same logic as the ServerRagdolls/ServerRagdollHandler example here.
+-- We handle players leaving along with players wanting to ragdoll the same way in the ServerRagdolls/ServerRagdollHandler example.
+function onClientEvent(ragdollPlayer, enabled, seed)
+	-- ServerRagdollHandler uses :FireAllClients() (we are not exempt from that), so we make sure that the ragdollPlayer isn't the current client.
+	if ragdollPlayer == client then
+		return
+	end;
+
+	local ragdoll = ragdolls[ragdollPlayer];
+	if enabled then
+		-- We check if the ragdoll exists already, which if true probably means they died and got a new character.
+		-- If true we destroy that ragdoll, and replace it with a new one.
+		if ragdoll then
+			ragdoll:Destroy()
+		end
+		
+		ragdoll = RagdollClass.new(ragdollPlayer.Character, seed);
+		ragdoll:SetRagdollEnabled(true);
+		-- We set the player key in the ragdolls table to be our ragdoll class, so once the ragdoll player client wants to disable their ragdoll state, 
+		-- we can find the associated RagdollClass object.
+		-- Why we are doing it in a table is because there can be multiple players, so we need to properly handle that.
+		ragdolls[ragdollPlayer] = ragdoll;
+	else
+		if ragdoll then
+			-- If we destroy the ragdoll, the actual ragdoll also disables.
+			-- We destroy it as we do not want it lying around in the memory forever, say if an user doesn't ragdoll for 20 minutes.
+			ragdoll:Destroy();
+			ragdolls[ragdollPlayer] = nil;
+		end;
+	end;
+end;
+
+-- If an user leaves when they are ragdolled, we need to destroy their ragdoll to not cause a memory leak.
+function onPlayerRemoving(player)
+	-- Check if this player has a ragdoll on this client
+	local ragdoll = ragdolls[player]
+	if ragdoll then
+		-- destroy it if it is there.
+		ragdoll:Destroy()
+		ragdolls[player] = nil
+	end
+end;
+
 --[[ Connections ]]--
 
 client.CharacterAdded:Connect(onCharacterAdded);
+ragdollRemote.OnClientEvent:Connect(onClientEvent);
+Players.PlayerRemoving:Connect(onPlayerRemoving);

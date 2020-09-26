@@ -18,9 +18,10 @@ local RagdollRigging = require(script.RagdollRigging);
 -- Configure ragdoll settings in configuration.
 local Configuration = require(script.Configuration);
 -- @@ Constructors
-function RagdollClass.new(character: Player.Character)
+function RagdollClass.new(character: Player.Character, seed: number)
 	local self = setmetatable({
 		character = character;
+		Seed = seed;
 		maid = Maid.new();
 		enabled = false;
 	}, RagdollClass);
@@ -75,7 +76,11 @@ function RagdollClass:SetRagdollEnabled(enabled: boolean)
 		end;
 
 		local maxRandomVelocity = Configuration.MaxRandomVelocity
-		local randomObject = Random.new(os.clock() * 1000 + (humanoidRootPart.Velocity + humanoidRootPart.Position + humanoidRootPart.Orientation).Magnitude * 100000);
+		local randomObject = Random.new(
+			self.Seed or os.clock() * 1000 + (humanoidRootPart.Velocity + humanoidRootPart.Position + humanoidRootPart.Orientation).Magnitude * 100000
+		);
+		-- we do not wanna use the same seed forever.
+		self.Seed = nil;
 		for _, basePart in pairs(character:GetDescendants()) do
 			if basePart:IsA("BasePart") then
 				local limb = humanoid:GetLimb(basePart);
@@ -191,5 +196,14 @@ function RagdollClass.GetLastWordFromPascalCase(text: string)
 	word = word:gsub("%d+$", "");
 	return word;
 end;
+
+function RagdollClass.DisableMotors(character: Player.Character)
+	local humanoid = character:FindFirstChildWhichIsA("Humanoid");
+	if not humanoid then
+		return {};
+	end;
+	return RagdollRigging.disableMotors(character, humanoid.RigType);
+end;
+
 
 return RagdollClass;

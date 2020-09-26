@@ -17,7 +17,7 @@ local ragdolls = {};
 
 --[[ Functions ]]--
 
-local function onServerEvent(ragdollPlayer, enabled)
+local function onServerEvent(ragdollPlayer, enabled, seed)
 	local ragdoll = ragdolls[ragdollPlayer];
 	if enabled then
 		-- We check if the ragdoll exists already, which if true probably means they died and got a new character.
@@ -26,7 +26,7 @@ local function onServerEvent(ragdollPlayer, enabled)
 			ragdoll:Destroy()
 		end
 		
-		ragdoll = RagdollClass.new(ragdollPlayer.Character);
+		ragdoll = RagdollClass.new(ragdollPlayer.Character, seed);
 		ragdoll:SetRagdollEnabled(true);
 		-- We set the player key in the ragdolls table to be our ragdoll class, so once the client wants to disable their ragdoll state, 
 		-- we can find the associated RagdollClass object.
