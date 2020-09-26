@@ -20,5 +20,5 @@
 
 ## Credits
  The actual ragdoll code itself was made by Quenty.
- I use a maid class created by Quenty.
- You can find the original code links in the source files.
+ I use an maid class created by Quenty.
+ You can find a link to the original code in the source files.
