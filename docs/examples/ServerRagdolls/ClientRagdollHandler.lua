@@ -57,7 +57,11 @@ local function onCharacterAdded(character)
 	-- Bind the ragdoll action, so that we can detect when the user presses the ragdoll keybind, and then enable/disable the ragdoll.
 	ContextActionService:BindAction("Ragdoll", handleAction, true, ragdollKeybind);
 	-- Connect to humanoid.Died
-	humanoid.Died:Connect(function()
+	local c;
+	c = humanoid.Died:Connect(function()
+		-- Disconnect the connection, as Humanoid.Died can fire multiple times.
+		c:Disconnect();
+		c = nil;
 		-- Unbind the ragdoll action, to not get any unintended errors outputted when the user tries to ragdoll when they are not alive.
 		ContextActionService:UnbindAction("Ragdoll");
 
