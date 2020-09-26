@@ -4,6 +4,8 @@
 
 	Source: https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Ragdoll/RagdollRigging.lua
 	License: https://github.com/Quenty/NevermoreEngine/blob/version2/LICENSE.md
+
+	Slightly modified to fit in for RagdollClass
 --]]
 
 local RunService = game:GetService("RunService")
@@ -228,7 +230,7 @@ local R6_MOTOR6DS = {
 	{"Right Hip", "Torso"},
 }
 
-local BALL_SOCKET_NAME = "RagdollBallSocket"
+local BALL_SOCKET_NAME = RunService:IsClient() and "RagdollBallSocket" or "ServerRagdollBallSocket"
 local NO_COLLIDE_NAME = "RagdollNoCollision"
 
 -- Index parts by name to save us from many O(n) FindFirstChild searches
@@ -260,7 +262,7 @@ local function createRigJoints(parts, rig)
 				local constraint = part1:FindFirstChild(BALL_SOCKET_NAME)
 				if not constraint then
 					constraint = Instance.new("BallSocketConstraint")
-					constraint.Name = RunService:IsClient() and BALL_SOCKET_NAME or "Server" .. BALL_SOCKET_NAME
+					constraint.Name = BALL_SOCKET_NAME
 				end
 				constraint.Attachment0 = a0
 				constraint.Attachment1 = a1

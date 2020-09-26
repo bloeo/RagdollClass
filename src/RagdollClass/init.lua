@@ -46,12 +46,12 @@ function RagdollClass:SetRagdollEnabled(enabled: boolean)
 	assert(enabled ~= self.enabled, "ragdoll is already in that state you're trying to set it to");
 	self.enabled = enabled;
 	if enabled then
-		-- This follows how it was setup in the NevermoreEngine Ragdollable class with minor modifications, so credits to them, here's the link to it:
-		-- https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Server/Ragdoll/Classes/Ragdollable.lua
+		-- I took some stuff from Ragdollable.lua by Quenty
+		-- Here's the link to it: https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Server/Ragdoll/Classes/Ragdollable.lua
 		local character = self.character;
 		local humanoid = self.humanoid;
-
 		local humanoidRootPart = self.humanoidRootPart;
+
 		local animator = humanoid:FindFirstChildWhichIsA("Animator");
 		local rigType = humanoid.RigType;
 
@@ -60,14 +60,7 @@ function RagdollClass:SetRagdollEnabled(enabled: boolean)
 		humanoid:ChangeState(Enum.HumanoidStateType.Physics);
 
 		RagdollRigging.createRagdollJoints(character, rigType);
-		RagdollRigging.disableMotors(character, rigType);
-
-		local motors = {};
-		for _, motor in pairs(character:GetDescendants()) do
-			if motor:IsA("Motor6D") then
-				motors[#motors + 1] = motor;
-			end;
-		end;
+		local motors = RagdollRigging.disableMotors(character, rigType);
 
 		if animator then
 			animator:ApplyJointVelocities(motors);
@@ -97,20 +90,42 @@ function RagdollClass:SetRagdollEnabled(enabled: boolean)
 
 		self:ReduceFriction();
 
+		-- Some extra support for the replication.
+		-- For the server-side ragdolls what essentially happens is ragdoll player creates a ragdollclass on their client, then sends a signal to the server.
+		-- the server creates an ragdoll on their side, which means now the server-sided ragdoll constraints will replicate to the client.
+		-- I edited the ragdoll rigging a little bit so that it puts "Server" in front of the server ragdoll constraints names, 
+		-- so that we can easily know if a ragdoll constraint is a server one or a client one.
+		if RunService:IsClient() then
+			self.maid:GiveTask(character.DescendantAdded:Connect(function(descendant)
+				if descendant:IsA("BallSocketConstraint") and (descendant.Name:find("Server")) == 1 then
+					descendant.Enabled = false;
+				end;
+			end));
+		end;
+
 		self.maid:GiveTask(humanoid.AnimationPlayed:Connect(function(animationTrack)
 			animationTrack:Stop(0.001);
 		end));
+
+		-- Prevent animation transform loop?
+		-- Took this from Quenty's ragdoll utils (https://github.com/Quenty/NevermoreEngine/blob/version2/Modules/Shared/Ragdoll/RagdollUtils.lua)
+		-- This is quite specific to R15
+		local lowerTorso = character:FindFirstChild("LowerTorso");
+		if lowerTorso then
+			local root = lowerTorso:FindFirstChild("Root");
+			if root then
+				local lastTransform = root.Transform;
+				self.maid:GiveTask(RunService.Stepped:Connect(function()
+					root.Transform = lastTransform;
+				end));
+			end;
+		end;
 
 		self.maid:GiveTask(humanoid.StateChanged:Connect(function(_, newState)
 			if newState ~= Enum.HumanoidStateType.Physics and newState ~= Enum.HumanoidStateType.Dead then
 				humanoid:ChangeState(Enum.HumanoidStateType.Physics);
 			end;
 		end));
-
-		-- I'm aware how this is slightly scuffed, however it is necessary for ragdolls to work smoothly on the server + client.
-		self.maid:GiveTask(character.DescendantAdded:Connect(function()
-		
-		end))
 
 		self.maid:GiveTask(function()
 			RagdollRigging.removeRagdollJoints(character);

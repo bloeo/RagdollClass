@@ -15,6 +15,9 @@
  It has support for replication, however it is up to you how you want to implement it.
  In the examples folder in documentation you can see how you can implement replication so that everyone can see your ragdolls.
 
+## Avatar Support
+ This supports both R6 and R15.
+
 ## Credits
  The actual ragdoll code itself was made by Quenty.
  I use a maid class created by Quenty.
