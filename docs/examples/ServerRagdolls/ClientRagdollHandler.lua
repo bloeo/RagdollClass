@@ -17,7 +17,7 @@ local RagdollClass = require(ReplicatedStorage:WaitForChild("RagdollClass"));
 local ragdollKeybind = Enum.KeyCode.R;
 
 -- Other variables
-local ragdoll;
+local clientRagdoll;
 local head;
 local humanoid;
 local ragdollEnabled = false;
@@ -39,7 +39,7 @@ local function handleAction(_, userInputState)
 			currentCamera.CameraSubject = humanoid;
 		end
 		-- We can assume that the RagdollClass object exists, as the action can only be binded when the character spawns in, which is when the ragdoll gets created.
-		ragdoll:SetRagdollEnabled(ragdollEnabled);
+		clientRagdoll:SetRagdollEnabled(ragdollEnabled);
 		-- Tell the server, "Hey, the ragdoll is in this state!", so that they can create or remove the ragdoll on their side, to show that this user is in this state.
 		ragdollRemote:FireServer(ragdollEnabled);
 	end;
@@ -53,7 +53,7 @@ local function onCharacterAdded(character)
 	head = character:FindFirstChild("Head");
 	-- Create a new ragdoll class, and set the ragdoll variable to it.
 	-- We need to set the ragdoll variable outside of this scope, so that the handleAction function can access it.
-	ragdoll = RagdollClass.new(character);
+	clientRagdoll = RagdollClass.new(character);
 	-- Bind the ragdoll action, so that we can detect when the user presses the ragdoll keybind, and then enable/disable the ragdoll.
 	ContextActionService:BindAction("Ragdoll", handleAction, true, ragdollKeybind);
 	-- Connect to humanoid.Died
@@ -62,10 +62,10 @@ local function onCharacterAdded(character)
 		ContextActionService:UnbindAction("Ragdoll");
 
 		-- Destroy the ragdoll class to not cause a memory leak
-		ragdoll:Destroy();
+		clientRagdoll:Destroy();
 
 		-- Set variables to nil, so there are no references to stuff that is no longer in use.
-		ragdoll = nil;
+		clientRagdoll = nil;
 		head = nil;
 		humanoid = nil;
 
