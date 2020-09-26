@@ -25,4 +25,5 @@
 
  The example should now be setup, and you can now observe how it functions.
 
- I recommend reading [ClientRagdolls](https://github.com/aku-e/RagdollClass/blob/master/docs/examples/ClientRagdolls/ClientRagdolls.md) if you haven't already.
+ I'd love to do an example for client ragdolls, however there's some weird bugs I do not know how to counter.
+ If you want to implement client ragdolls, please do because you're able to. This is only an example.
