@@ -2,8 +2,10 @@
 	Name: RagdollClass
 	Author: guidable
 
-	Source: https://github.com/aku-e/RagdollClass/blob/master/src/RagdollClass/init.lua
+	Source: https://github.com/aku-e/RagdollClass
 	License: https://github.com/aku-e/RagdollClass/blob/master/LICENSE.md
+
+	Creation date: 2020/09/25
 --]]
 
 local RagdollClass = {};
