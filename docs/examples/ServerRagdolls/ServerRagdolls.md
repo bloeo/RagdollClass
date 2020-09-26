@@ -18,10 +18,10 @@ They are considerably easier to make than client-sided bodies, as you have to do
 First, create a local script which should be parented to ``StarterPlayer.StarterPlayerScripts``.
 This will be our client-sided handler, so feel free to call it anything you want.
 
-Copy paste the code from [ClientRagdollHandler.lua]() and paste it in the newly created local script.
+Copy paste the code from [ClientRagdollHandler.lua](https://github.com/aku-e/RagdollClass/blob/master/docs/examples/ServerRagdolls/ClientRagdollHandler.lua) and paste it in the newly created local script.
 
 After that, create a server script, and parent it to ``ServerScriptService`` (it does not matter that much where you parent the server script, however ServerScriptService is intended for storing server scripts as implied by the name).
 
-Copy paste the code from [ServerRagdollHandler.lua]() and paste it into the server script.
+Copy paste the code from [ServerRagdollHandler.lua](https://github.com/aku-e/RagdollClass/blob/master/docs/examples/ServerRagdolls/ServerRagdollHandler.lua) and paste it into the server script.
 
 The example should now be setup, and you can now observe how it functions.
