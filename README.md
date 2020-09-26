@@ -11,9 +11,9 @@
 ## Documentation
  - [Documentation](https://github.com/aku-e/RagdollClass/blob/master/docs)
  
- I feel like it is important enough to mention: this does not handle replication.
+ I feel like it is important enough to mention: RagdollClass does not handle replication.
  It has support for replication, however it is up to you how you want to implement it.
- In the examples folder in documentation you can see how you can implement replication so that everyone can see your ragdolls.
+ In the [examples](https://github.com/aku-e/RagdollClass/blob/master/docs/examples) folder you can see how you can implement replication so that everyone can see your ragdolls.
 
 ## Avatar Support
  This supports both R6 and R15.
