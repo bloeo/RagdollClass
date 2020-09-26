@@ -81,7 +81,7 @@ function RagdollClass:SetRagdollEnabled(enabled: boolean)
 		);
 		-- we do not wanna use the same seed forever.
 		self.Seed = nil;
-		for _, basePart in pairs(character:GetDescendants()) do
+		for _, basePart in pairs(character:GetChildren()) do
 			if basePart:IsA("BasePart") then
 				local limb = humanoid:GetLimb(basePart);
 				if limb ~= Enum.Limb.Unknown then
