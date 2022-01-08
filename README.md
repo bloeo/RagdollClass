@@ -1,5 +1,8 @@
 # RagdollClass
- A class that allows you to create togglable ragdolls with ease.
+ A class that allows you to create togglable ragdolls with ease for R6.
+
+# This is archived
+ This is archived because I don't recommend using this. I'm not particularly confident in the code, and I have learnt a lot since then, but I reckon someone could learn something from it which is why it is public.
 
 ## How to use
  - [Install Rojo if you haven't already!](https://rojo.space)
